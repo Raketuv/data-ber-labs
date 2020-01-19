@@ -1,0 +1,37 @@
+-- Show orders
+
+SELECT
+	*
+FROM olist.orders
+WHERE
+	DATE(order_purchase_timestamp) >= '2018-01-01'
+	AND DATE(order_purchase_timestamp) < '2018-02-01';
+	
+	
+	-- Show purchase timestamp and count
+
+SELECT
+	DATE_FORMAT(order_purchase_timestamp, '%Y-%m-01') 	AS order_date,
+	COUNT(*)						AS orders	
+FROM olist.orders
+WHERE
+	DATE(order_purchase_timestamp) >= '2016-01-01'
+	AND DATE(order_purchase_timestamp) < '2018-02-01'
+GROUP BY 1;
+
+
+USE olist AS O;
+-- idk
+
+SELECT
+	o.*,
+	order_purchase_timestamp,
+	DATE_FORMAT(order_purchase_timestamp), '%Y-%m-%d'
+FROM olist.orders o
+LIMIT 1000;
+
+
+--- cont lesson
+
+SELECT 1 = 1;
+

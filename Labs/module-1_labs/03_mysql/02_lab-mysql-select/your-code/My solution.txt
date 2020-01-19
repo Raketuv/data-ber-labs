@@ -1,0 +1,113 @@
+-- Show authors complete
+SELECT * FROM authors;
+
+-- Show titles complete
+SELECT * FROM titles;
+	
+-- Show title authors complete
+SELECT * FROM titleauthor;
+
+-- Show only author id and title id
+SELECT au_id, title_id FROM titleauthor ORDER BY au_id;
+
+-- Join authors and titleauthor by au_id
+
+SELECT authors.*, titleauthor.au_id, titleauthor.title_id
+FROM authors, titleauthor
+WHERE authors.au_id = titleauthor.au_id;
+
+-- Show table x
+SELECT * from titles;
+
+-- publishers has pub_id and pub_name
+
+-- titles has title id and title and pub id
+
+
+-- Create full inner join function for all important columns
+
+SELECT authors.au_id, authors.au_lname, authors.au_fname, titleauthor.au_id, titleauthor.title_id, titles.title_id, titles.pub_id, publishers.pub_id, publishers.pub_name
+FROM Publications
+INNER JOIN category
+ON authors.au_id = titleauthor.au_id, titleauthor.title_id = titles.title_id, titles.pub_id = publishers.pub_id;
+
+
+-- test
+SELECT qty, title_id FROM sales ORDER BY title_id;
+
+-- count qty per title id sold
+
+CREATE TEMPORARY TABLE temp_1
+SELECT title_id, SUM(qty) AS sold
+FROM sales
+GROUP BY title_id;
+
+-- count qty per title id sold 
+-- W COALESCE
+
+CREATE TEMPORARY TABLE temp_1
+SELECT title_id, COALESCE(SUM(qty),0) AS sold
+FROM sales
+INNER JOIN titles ON sales.title_id = titles.title_id
+GROUP BY title_id;
+
+SELECT * from temp_1;
+
+DROP TABLE temp_1;
+
+-- Add zeros to sold
+
+SELECT * FROM titles;
+
+-- inner join other method
+
+SELECT authors.au_id, authors.au_lname, authors.au_fname, titleauthor.title_id, publishers.pub_id, publishers.pub_name, titles.title
+FROM authors
+INNER JOIN titleauthor 	ON authors.au_id = titleauthor.au_id
+INNER JOIN titles 		ON titleauthor.title_id = titles.title_id
+INNER JOIN publishers	ON titles.pub_id = publishers.pub_id;
+
+-- count author and publishers tuples
+
+SELECT au_id, pub_name, au_lname, au_fname, COUNT(*) as Count FROM (
+	SELECT authors.au_id, authors.au_lname, authors.au_fname, titleauthor.title_id, publishers.pub_id, publishers.pub_name
+	FROM authors
+	INNER JOIN titleauthor 	ON authors.au_id = titleauthor.au_id
+	INNER JOIN titles 		ON titleauthor.title_id = titles.title_id
+	INNER JOIN publishers	ON titles.pub_id = publishers.pub_id) AS derived_table
+group by au_id, pub_name
+order by count desc ;
+
+
+-- join full table with sold per book
+
+
+SELECT authors.au_id, authors.au_lname, authors.au_fname, titleauthor.title_id, publishers.pub_id, publishers.pub_name, titles.title, temp_1.sold
+FROM authors
+LEFT JOIN titleauthor 	ON authors.au_id = titleauthor.au_id
+LEFT JOIN titles 		ON titleauthor.title_id = titles.title_id
+LEFT JOIN publishers	ON titles.pub_id = publishers.pub_id
+LEFT JOIN temp_1 		ON titles.title_id = temp_1.title_id;
+
+
+-- configure above to sum per authors:
+
+SELECT au_id, au_lname, au_fname, COALESCE(SUM(sold),0) AS total_sales
+FROM 	(SELECT authors.au_id, authors.au_lname, authors.au_fname, titleauthor.title_id, publishers.pub_id, publishers.pub_name, titles.title, temp_1.sold
+		FROM authors
+		LEFT JOIN titleauthor 	ON authors.au_id = titleauthor.au_id
+		LEFT JOIN titles 		ON titleauthor.title_id = titles.title_id
+		LEFT JOIN publishers	ON titles.pub_id = publishers.pub_id
+		LEFT JOIN temp_1 		ON titles.title_id = temp_1.title_id) AS tableaaa
+GROUP BY au_id
+ORDER BY total_sales DESC;
+
+
+-- show unique authors
+
+SELECT au_id, au_lname, au_fname from authors;
+
+
+-- show cmd
+
+SELECT * FROM roysched;
